@@ -1,0 +1,6 @@
+Flask
+Werkzeug
+pytest
+# Dependencies required for the /pdf_to_png route
+pymupdf
+Pillow
