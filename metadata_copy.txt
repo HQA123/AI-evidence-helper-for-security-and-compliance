@@ -1,0 +1,17 @@
+
+{"evidence_type": ["Policy Document"], "summary": "该文件为背景调查管理制度，涵盖了背景调查的目的、适用范围、岗位职能及角色定义、核查内容、流程、异常情况处理等。", "system": "HR System", "recommended_use": "HR due diligence, onboarding process, risk assessment", "file_name": "背景调查管理制度", "content_keywords": ["背景调查", "HR", "合规", "风险", "入职", "核查", "流程"], "time_period": "2023.7.7"}
+{"evidence_type": ["screenshot"], "summary": "KU 培训内容截图，包含四个章节： 隐私合规重要性、客户端隐私保證措施、员工隐私保證要點、隐私合规風險與應對", "system": "General - For Internal Use", "recommended_use": "培训资料", "file_name": "KU_培训内容截图", "content_keywords": ["隐私合规", "客户端隐私", "员工隐私", "风险与应对", "合规培训"], "time_period": "未提及"}
+
+{"evidence_type": ["流程图", "截图"], "summary": "KU_INFRA_IR_[E-1]_[CSIRT 组织结构图] v1.0 事件响应应急报流程图，包含事件处理、分析和数据处理等步骤，并记录了相关人员和时间信息。", "system": "KU_INFRA_IR", "recommended_use": "事件响应流程分析，人员责任追踪，时间线梳理", "file_name": "KU_INFRA_IR_[E-1]_[CSIRT 组织结构图] v1.0", "content_keywords": ["事件响应", "应急报流程", "CSIRT", "组织结构图", "数据处理", "分析"], "time_period": "2024-03-30 to 2024-04-01 10:00"}
+
+{"evidence_type": ["RACI Matrix"], "summary": "This document is a RACI matrix for KU_INFRA_IR_[E-2]_[IR 职责矩阵] v1.0.", "system": "KU_INFRA_IR", "recommended_use": "Define roles and responsibilities for IR related tasks.", "file_name": "KU_INFRA_IR_[E-2]_[IR 职责矩阵] v1.0.png", "content_keywords": ["RACI", "Responsible", "Accountable", "Consulted", "Informed", "项目设计", "安全方案", "安全测试", "上线审批", "运维监控", "漏洞处置", "故障处理", "安全事件应急", "数据脱敏", "外部审计"], "time_period": "v1.0 (date not specified in document) "}
+
+{"evidence_type": ["报告", "网络拓扑图"], "summary": "KU_INFRA_E-5_INFRA - 演练报告_v1.0，20250804 东京AWS-东京阿里云云专线中间演练报告", "system": "AWS, 阿里云", "recommended_use": "网络安全演练分析", "file_name": "KU_INFRA_E-5_INFRA - 演练报告_v1.0", "content_keywords": ["专线", "中间演练", "VPN", "网络拓扑", "公网IP"], "time_period": "20250804, August 12, 2025 at 9:00:00 PM, August 12, 2025 at 1:00:00 AM"}
+
+{"evidence_type": ["Lessons Learned 报告", "聊天记录", "图片", "CSV文件"], "summary": "2023-10-20 AWS 某东-区域停导致域名解析异常，影响了自动检测与快速切换能力，导致第三方DNS异常。涉及Infoblox DNS服务器故障，导致AWS DNS和Azure DNS部分域名解析异常。主要问题在于Infoblox的自动检测与快速切换机制失效，导致无法快速响应和定位问题。", "system": "Infoblox, AWS DNS, Azure DNS", "recommended_use": "使用Infoblox，通过AWS 故障放大解析异常。配置灰度更新策略，避免单点故障。", "file_name": "KU_INFRA_IR_[E-21]_[Lessons Learned 复盘报告]_v1.0", "content_keywords": ["Infoblox DNS", "AWS DNS", "Azure DNS", "域名解析", "自动检测", "快速切换", "DNS 故障", "路由", "高可用", "故障转移"], "time_period": "2023-10-20 (主要事件时间点)"}
+
+{"evidence_type": ["SOP文档", "截图", "命令行输出"], "summary": "此证据包含一个关于主机上的数字取证流程的SOP文档，以及在macOS和Linux主机上执行该流程的截图和命令行输出。", "system": "macOS and Linux", "recommended_use": "数字取证分析", "file_name": "KU_IR_[E-7]_[数字取证流程]_v1.0", "content_keywords": ["数字取证", "主机取证", "CrowdStrike", "文件提取", "压缩解压", "命令行", "Splunk", "json"], "time_period": "2023-09-26 to 2023-09-29"}
+
+{"evidence_type": ["截图"], "summary": "截图展示了KU-security漏洞管理台的页面信息，包括漏洞列表、SAST报告及复测记录、修复率统计等。", "system": "KU-security 漏洞管理台", "recommended_use": "漏洞跟踪、漏洞修复状态评估、漏洞复测情况分析", "file_name": "KU_security_[5.2.2]_[漏洞修复]_v1.0", "content_keywords": ["漏洞", "修复", "SAST", "复测", "漏洞管理", "修复率"], "time_period": "2024-06-17 至 2025-11-06"}
+
+{"evidence_type": ["SCA 扫描报告", "安全评估记录", "第三方组件风险清单 & 白名单", "漏洞溯源信息"], "summary": "该证据包含SCA扫描报告、安全评估记录、第三方组件风险清单&白名单以及漏洞溯源信息。报告识别出73个组件，其中存在1个高风险漏洞，25个中风险漏洞，47个低风险漏洞。", "system": "KU_security_[7.1.1]_[第三方代码与API管理]_v1.0", "recommended_use": "用于第三方组件安全风险评估、漏洞管理和安全加固。", "file_name": "KU_security_[7.1.1]_[第三方代码与API管理]_v1.0.png", "content_keywords": ["SCA", "第三方组件", "漏洞", "风险", "安全评估"]}
