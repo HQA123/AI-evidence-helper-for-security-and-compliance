@@ -1,18 +1,70 @@
-AI-evidence-helper-for-security-and-compliance
-本项目的用处：利用AI给安全合规证据打标签并写入知识库，再根据知识库使用AI进行检索。可与快速找出上传过的证据。证据支持的格式包括：图片、pdf、文档和表格。
+# AI Evidence Helper for Security and Compliance
 
-前提：1.安装ollama，gemma3:27b，qwen3-embedding:0.6b
-2.安装dify。
+This project leverages AI to automatically label security and compliance evidence and store it in a knowledge base. You can then search the knowledge base using AI to quickly locate previously uploaded evidence. The supported evidence formats include images, PDFs, documents, and spreadsheets.
 
-注意配置ollama时要在/etc/systemd/system/ollama.service里面加入Environment="OLLAMA_HOST=[docker0 ip]:11434"
-对应的dify里面添加ollama model的base url填入http://[docker0 ip]:11434
+## **Prerequisites**
 
-操作步骤
-1. dify工作流-证据导入模块
-<img width="3616" height="911" alt="Steven证据库导入助手-whole-workflow" src="https://github.com/user-attachments/assets/2097e740-548e-404b-82d7-4914f0ccd230" />
-<img width="933" height="876" alt="条件分支" src="https://github.com/user-attachments/assets/3131bcc4-34a9-417b-9578-08fbdb8e439f" />
-<img width="903" height="908" alt="pdf转png" src="https://github.com/user-attachments/assets/70d4539c-aba8-434a-8ca6-08947d3ea96d" />
-<img width="906" height="1015" alt="LLM1" src="https://github.com/user-attachments/assets/47ec8302-fe0a-4ed3-a1a2-679c98441513" />
-<img width="914" height="946" alt="LLM2" src="https://github.com/user-attachments/assets/49dc2564-bf0b-46b0-a9db-d4de7d29be89" />
-<img width="895" height="1015" alt="持久化存储" src="https://github.com/user-attachments/assets/27b9ad98-ef38-4cff-a910-1a375ecafd7c" />
+1. **Install Ollama**:  
+   Use the `gemma3:27b` and `qwen3-embedding:0.6b` models for the AI tasks.
+   
+2. **Install Dify**:  
+   Set up Dify for workflow management and model integration.
 
+3. **Configuration**:
+   - When configuring Ollama, add the following line in the `/etc/systemd/system/ollama.service` file:
+     ```bash
+     Environment="OLLAMA_HOST=[docker0 ip]:11434"
+     ```
+   - In Dify, set the base URL for the Ollama model to:
+     ```bash
+     http://[docker0 ip]:11434
+     ```
+
+## **Steps to Use**
+
+### **1. Evidence Import Workflow in Dify**
+
+The first step is to import evidence into the system. The workflow includes various stages, from file conversion to metadata generation and storage.
+
+- **Evidence Import Module**:  
+   The images below illustrate the evidence import workflow in Dify.
+
+   ![Evidence Import Workflow](https://github.com/user-attachments/assets/2097e740-548e-404b-82d7-4914f0ccd230)
+
+   - **Conditional Branching**:  
+     ![Conditional Branch](https://github.com/user-attachments/assets/3131bcc4-34a9-417b-9578-08fbdb8e439f)
+
+   - **PDF to PNG Conversion**:  
+     ![PDF to PNG](https://github.com/user-attachments/assets/70d4539c-aba8-434a-8ca6-08947d3ea96d)
+
+   - **AI Processing (LLM1)**:  
+     ![LLM1](https://github.com/user-attachments/assets/47ec8302-fe0a-4ed3-a1a2-679c98441513)
+
+   - **AI Processing (LLM2)**:  
+     ![LLM2](https://github.com/user-attachments/assets/49dc2564-bf0b-46b0-a9db-d4de7d29be89)
+
+   - **Persistent Storage**:  
+     ![Persistent Storage](https://github.com/user-attachments/assets/27b9ad98-ef38-4cff-a910-1a375ecafd7c)
+
+### **2. Evidence Retrieval Workflow in Dify**
+
+Once the evidence has been processed and stored, you can retrieve it via AI-powered search.
+
+- **Evidence Retrieval Module**:  
+   Below is the entire workflow for evidence retrieval in Dify.
+
+   ![Evidence Retrieval Workflow](https://github.com/user-attachments/assets/d3463f28-5638-4e88-bcbc-9a34c35b7570)
+
+   - **LLM-based Search**:  
+     ![LLM Search](https://github.com/user-attachments/assets/2c6b9fbf-6584-4965-bb5e-838712204ab8)
+
+### **3. Backend Flask Service**
+
+After importing the evidence, the `metadata.txt` file is imported into Dify’s knowledge base. This enables efficient evidence storage and retrieval through the workflow.
+
+---
+
+## **Collaborate with Us**
+
+For collaboration or inquiries, please contact:  
+**qa-huang@foxmail.com**
