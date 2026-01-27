@@ -1,24 +1,7 @@
-from flask import Flask, request, jsonify, send_file, Response
+from flask import Flask, request, jsonify, send_file
 import os
 import json
 import threading
-import io
-import uuid
-from werkzeug.utils import secure_filename
-
-# Add imports for PDF processing (dynamic to avoid static linter issues)
-import importlib
-pymupdf = None
-Image = None
-try:
-    pymupdf = importlib.import_module('pymupdf')
-except Exception:
-    pymupdf = None
-try:
-    pil_image = importlib.import_module('PIL.Image')
-    Image = pil_image
-except Exception:
-    Image = None
 
 file_lock = threading.Lock()
 
@@ -32,14 +15,15 @@ def create_app(file_path: str = None):
     """
     app = Flask(__name__)
 
-    # Determine file path at app creation time so tests can override via env
-    if file_path is None:
-        file_path = os.environ.get(
-            'METADATA_FILE', os.path.join(os.path.dirname(__file__), 'metadata.txt')
-        )
-
     @app.route('/', methods=['GET'])
     def index():
+        # If an external service (or a client) sends requests to `/` but
+        # includes a `file_name` query param (as Dify sometimes does), forward
+        # the call to the evidence handler so it behaves as expected.
+        print(f"Request to index path: {request.path}, full_path: {request.full_path}")
+        if request.args.get('file_name'):
+            # call the evidence handler directly so the same logic is reused
+            return get_evidence()
         return 'Dify Webhook Receiver is running.', 200
 
     @app.route('/webhook', methods=['POST'])
@@ -50,7 +34,7 @@ def create_app(file_path: str = None):
            - form field 'metadata' : JSON 字符串 (可选)
            - file field 'evidence' : 单个或多个文件 (至少一个)
         2) application/json (原来行为)：整个 body 为 metadata JSON
-        保存 evidence 到 evidece_source_file 目录，metadata 中附加 saved_files 列表并写入 metadata 文件。
+        保存 evidence 到 evidence_source_file 目录，metadata 中附加 saved_files 列表并写入 metadata 文件。
         """
         # 先判断是否 multipart/form-data（包含文件上传）
         content_type = request.content_type or ''
@@ -73,7 +57,7 @@ def create_app(file_path: str = None):
             if not files:
                 return jsonify({'error': 'No evidence files uploaded under field "evidence"'}), 400
 
-            base_dir = os.path.join(os.path.dirname(__file__), 'evidece_source_file')
+            base_dir = os.path.join(os.path.dirname(__file__), 'evidence_source_file')
             os.makedirs(base_dir, exist_ok=True)
 
             for f in files:
@@ -133,94 +117,41 @@ def create_app(file_path: str = None):
 
         return jsonify({'status': 'ok', 'saved_files': saved_files}), 200
 
-    @app.route('/pdf_to_png', methods=['POST']) # unfinished
-    def pdf_to_png_route():
+    # 新增：根据 query 参数 file_name 精确检索并返回 evidence 文件
+    @app.route('/evidence', methods=['GET'])
+    def get_evidence():
         """
-        Convert an uploaded PDF to PNG images.
-        Accepts multipart/form-data with field 'pdf' (file) and optional 'zoom' (int).
-        Returns a single PNG if the PDF has one page, otherwise a ZIP of PNGs.
+        GET /evidence?file_name=<exact filename>
+        如果在 evidence_source_file 目录下找到与 file_name 完全相同的文件名，则返回该文件；
+        否则返回 404 JSON。
+
+        为防止路径穿越，仅允许简单文件名（不包含路径分隔符），并使用安全检查。
         """
-        if pymupdf is None or Image is None:
-            return jsonify({'error': 'Server missing dependencies for PDF processing (pymupdf, Pillow)'}), 500
+        print("Entered /evidence route")
+        print(f"Request path: {request.path}, full_path: {request.full_path}")
+        file_name = request.args.get('file_name')
+        if not file_name:
+            return jsonify({'error': 'Missing required query parameter: file_name'}), 400
 
-        if not request.content_type or not request.content_type.startswith('multipart/form-data'):
-            return jsonify({'error': 'Content-Type must be multipart/form-data with a "pdf" file field'}), 400
+        # Reject any path separators to avoid traversal
+        if '/' in file_name or '\\' in file_name or os.path.basename(file_name) != file_name:
+            return jsonify({'error': 'Invalid file_name'}), 400
 
-        pdf_file = request.files.get('pdf')
-        if not pdf_file or not pdf_file.filename:
-            return jsonify({'error': 'No PDF file uploaded under field "pdf"'}), 400
+        base_dir = os.path.join(os.path.dirname(__file__), 'evidence_source_file')
+        if not os.path.isdir(base_dir):
+            return jsonify({'error': 'evidence directory not found'}), 500
 
-        # Read zoom parameter (optional)
-        zoom_param = request.form.get('zoom')
-        try:
-            zoom = 4 if zoom_param is None or zoom_param == '' else int(zoom_param)
-        except Exception:
-            return jsonify({'error': 'zoom must be an integer'}), 400
-
-        # Read file bytes
-        pdf_bytes = pdf_file.read()
-        if not pdf_bytes:
-            return jsonify({'error': 'Uploaded PDF is empty'}), 400
+        # 精确匹配目录中的文件名（区分大小写，取决于文件系统）
+        candidate_path = os.path.join(base_dir, file_name)
+        if not os.path.isfile(candidate_path):
+            # 如果没有精确匹配，则返回 404
+            return jsonify({'error': 'File not found'}), 404
 
         try:
-            # Open PDF with PyMuPDF
-            doc = pymupdf.open(stream=io.BytesIO(pdf_bytes), filetype='pdf')
+            # 使用 send_file 返回文件，作为附件下载
+            return send_file(candidate_path, as_attachment=True)
         except Exception as e:
-            return jsonify({'error': f'Invalid PDF file: {str(e)}'}), 400
-
-        try:
-            total_pages = doc.page_count
-            if total_pages == 0:
-                return jsonify({'error': 'The PDF file contains no pages.'}), 400
-
-            images = []  # list of tuples (filename, bytes)
-            original_name = secure_filename(pdf_file.filename)
-            base_name = original_name.rsplit('.', 1)[0]
-
-            for i in range(total_pages):
-                page = doc.load_page(i)
-                mat = pymupdf.Matrix(zoom, zoom)
-                pix = page.get_pixmap(matrix=mat)
-                img = Image.frombytes('RGB', [pix.width, pix.height], pix.samples)
-
-                buf = io.BytesIO()
-                img.save(buf, format='PNG')
-                buf.seek(0)
-                fname = f"{base_name}_page{i+1}.png"
-                images.append((fname, buf.read()))
-
-            # If single image, return directly
-            if len(images) == 1:
-                img_bytes = images[0][1]
-                return send_file(io.BytesIO(img_bytes), mimetype='image/png', as_attachment=True,
-                                 download_name=images[0][0])
-
-            # Multiple images -> return multipart/mixed response with each image as a part
-            # Use a random boundary to separate parts
-            boundary = '=====' + uuid.uuid4().hex
-            CRLF = '\r\n'
-
-            def generate_parts(img_list, bdr):
-                for fname, b in img_list:
-                    # part header
-                    yield (f'--{bdr}{CRLF}').encode('utf-8')
-                    yield (f'Content-Type: image/png{CRLF}').encode('utf-8')
-                    # Use simple Content-Disposition with filename; if clients need RFC5987, adapt accordingly
-                    yield (f'Content-Disposition: attachment; filename="{fname}"{CRLF}{CRLF}').encode('utf-8')
-                    # image bytes
-                    yield b
-                    yield CRLF.encode('utf-8')
-                # final boundary
-                yield (f'--{bdr}--{CRLF}').encode('utf-8')
-
-            return Response(generate_parts(images, boundary),
-                            mimetype=f'multipart/mixed; boundary={boundary}')
-        finally:
-            try:
-                doc.close()
-            except Exception:
-                pass
-
+            return jsonify({'error': f'Failed to send file: {str(e)}'}), 500
     return app
 
 

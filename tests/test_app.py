@@ -36,7 +36,7 @@ def create_app(file_path: str = None):
            - form field 'metadata' : JSON 字符串 (可选)
            - file field 'evidence' : 单个或多个文件 (至少一个)
         2) application/json (原来行为)：整个 body 为 metadata JSON
-        保存 evidence 到 evidece_source_file 目录，metadata 中附加 saved_files 列表并写入 metadata 文件。
+        保存 evidence 到 evidence_source_file 目录，metadata 中附加 saved_files 列表并写入 metadata 文件。
         """
         # 先判断是否 multipart/form-data（包含文件上传）
         content_type = request.content_type or ''
@@ -59,7 +59,7 @@ def create_app(file_path: str = None):
             if not files:
                 return jsonify({'error': 'No evidence files uploaded under field "evidence"'}), 400
 
-            base_dir = os.path.join(os.path.dirname(__file__), 'evidece_source_file')
+            base_dir = os.path.join(os.path.dirname(__file__), 'evidence_source_file')
             os.makedirs(base_dir, exist_ok=True)
 
             for f in files:
@@ -123,7 +123,7 @@ def create_app(file_path: str = None):
     def get_evidence():
         """
         Accept JSON body: {"file_names": ["a.png", "b.pdf", ...]}
-        Search in evidece_source_file directory (same dir as this module) and return files.
+        Search in evidence_source_file directory (same dir as this module) and return files.
         If multiple files requested, return a zip archive. If any requested file missing, return 404 with details.
         """
         try:
@@ -140,7 +140,7 @@ def create_app(file_path: str = None):
             return jsonify({'error': 'file_names must be a list of strings'}), 400
 
         # Evidence directory (relative to this file)
-        base_dir = os.path.join(os.path.dirname(__file__), 'evidece_source_file')
+        base_dir = os.path.join(os.path.dirname(__file__), 'evidence_source_file')
 
         found_files = []
         missing = []

@@ -1,0 +1,38 @@
+# .gitignore for Evidence_Interaction project
+# Ignore evidence files and the plugin folder (requested)
+
+evidence_source_file/
+dify-pdf-process-plugin/
+
+# Common Python-related ignores
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.so
+*.egg-info/
+dist/
+build/
+
+# Virtual environment and env files
+.env
+venv/
+.env/
+
+# IDE/editor files
+.vscode/
+.idea/
+
+# Logs and temporary files
+*.log
+coverage/
+htmlcov/
+.pytest_cache/
+
+# macOS
+.DS_Store
+
+# others
+*.sqlite3
+
