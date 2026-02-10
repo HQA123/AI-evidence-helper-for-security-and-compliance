@@ -105,8 +105,7 @@ def create_app(file_path: str = None):
 
             # 把保存的文件名写入 metadata 以便记录
             if saved_files:
-                metadata.setdefault('saved_files', [])
-                metadata['saved_files'].extend(saved_files)
+                metadata['file_name']=safe_name
 
         else:
             # 维持原本的 JSON 行为
@@ -126,7 +125,9 @@ def create_app(file_path: str = None):
         entry = json.dumps(metadata, ensure_ascii=False)
         try:
             # Ensure directory exists
-            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            dir_path = os.path.dirname(file_path)
+            if dir_path:
+                os.makedirs(dir_path, exist_ok=True)
             with file_lock:
                 with open(file_path, 'a', encoding='utf-8') as f:
                     f.write('\n' + entry + '\n')
