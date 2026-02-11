@@ -1,0 +1,271 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: workflow
+  name: test
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/ollama:0.0.8@22213ae036605d41ea73bdd16908e03de1b9d5ab4656a49b8fb0343723f4cb4a
+    version: null
+kind: app
+version: 0.5.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: http-request
+      id: 1770194035114-source-1770194581153-target
+      selected: false
+      source: '1770194035114'
+      sourceHandle: source
+      target: '1770194581153'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: llm
+      id: 1770190462183-source-1770194035114-target
+      source: '1770190462183'
+      sourceHandle: source
+      target: '1770194035114'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: false
+        title: 用户输入
+        type: start
+        variables:
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - image
+          - document
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          default: ''
+          hint: ''
+          label: myfiles
+          max_length: 10
+          options: []
+          placeholder: ''
+          required: true
+          type: file-list
+          variable: myfiles
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - image
+          - document
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          default: ''
+          hint: ''
+          label: original_file
+          max_length: 10
+          options: []
+          placeholder: ''
+          required: true
+          type: file-list
+          variable: original_file
+      height: 134
+      id: '1770190462183'
+      position:
+        x: 404.579060477302
+        y: 227.3807526005076
+      positionAbsolute:
+        x: 404.579060477302
+        y: 227.3807526005076
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemma3:27b-it-qat
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - id: cef32c52-f987-4df9-9378-3c9183a35a7e
+          role: system
+          text: '你是一个合规证据分析助手。以下是从证据文件解析出的文本内容和图片OCR内容，请根据内容分析并输出结构化的 metadata。
+
+
+            只根据事实，不要编造信息。'
+        selected: true
+        structured_output:
+          schema:
+            properties:
+              content_keywords:
+                description: Several important keywords extracted from the content
+                items:
+                  type: string
+                type: array
+              evidence_type:
+                description: Type of evidence, e.g., image, log, policy, configuration,
+                  report
+                items:
+                  type: string
+                type: array
+              file_name:
+                description: Name of the evidence file
+                type: string
+              recommended_use:
+                description: Suggested audit or compliance scenario where this evidence
+                  can be reused
+                type: string
+              summary:
+                description: 1-2 sentence summary describing the evidence
+                type: string
+              system:
+                description: System or platform related to the evidence, e.g., Splunk,
+                  OKTA, AWS, etc
+                type: string
+              time_period:
+                description: Last update time for the evidence, if identifiable just
+                  fill the data, otherwise left blank.
+                type: string
+            required:
+            - evidence_type
+            - summary
+            - system
+            - recommended_use
+            - file_name
+            - content_keywords
+            type: object
+        structured_output_enabled: true
+        title: LLM
+        type: llm
+        vision:
+          configs:
+            detail: high
+            variable_selector:
+            - '1770190462183'
+            - myfiles
+          enabled: true
+      height: 87
+      id: '1770194035114'
+      position:
+        x: 895.1946333934761
+        y: 277.56040102287614
+      positionAbsolute:
+        x: 895.1946333934761
+        y: 277.56040102287614
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-1217
+            key: metadata
+            type: text
+            value: '{{#1770194035114.structured_output#}}'
+          - file:
+            - '1770190462183'
+            - original_file
+            id: key-value-1712
+            key: evidence
+            type: file
+            value: ''
+          type: form-data
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: 本地持久化储存
+        type: http-request
+        url: http://192.168.43.173:5000/webhook
+        variables: []
+      height: 136
+      id: '1770194581153'
+      position:
+        x: 1402.1544410918718
+        y: 248.3807526005076
+      positionAbsolute:
+        x: 1402.1544410918718
+        y: 248.3807526005076
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    viewport:
+      x: -506.4598879232576
+      y: -35.598046931693716
+      zoom: 1.0281138266560668
+  rag_pipeline_variables: []
